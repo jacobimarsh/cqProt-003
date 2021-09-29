@@ -1,2 +1,2 @@
-gene    chr     start   end
-173kb   20      31690735        31690737
+gene  chr start end
+GWAS_plink_whole  20  31621924  31644477
