@@ -1,0 +1,3 @@
+##blocks
+plink --vcf fin_b51_protein_Gm20.SNPs.id.biallic_maf_0.01_geno_0.1.vcf --blocks no-pheno-req --allow-extra-chr --out fin_b51_protein_Gm20.SNPs.id.biallic_maf_0.01_geno_0.1.vcf --blocks-max-kb 10000
+S
