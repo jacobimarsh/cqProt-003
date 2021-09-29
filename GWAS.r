@@ -1,9 +1,8 @@
-conda create -n r-env r-base r-essentials 
-conda activate r-env 
-conda install -c conda-forge blast=2.5 mkl\
-conda install r-rMVP  
+#conda create -n r-env r-base r-essentials 
+#conda activate r-env 
+#conda install -c conda-forge blast=2.5 mkl\
+#conda install r-rMVP  
 
-R
 library("rMVP")
 
 MVP.Data(fileVCF="myVCF.vcf",
