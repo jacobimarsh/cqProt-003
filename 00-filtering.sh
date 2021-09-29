@@ -17,3 +17,8 @@ awk '$5 !~ /([[:alpha:]])+,[[:alpha:]]/{print}' gwas_Gm20.id.vcf |grep -v "*" > 
 
 #Imputation
 java -jar beagle.18May20.d20.jar gt=protein_Gm20.SNPs.id.biallic_maf_0.01_geno_0.1.vcf nthreads=22 out=fin_b51_protein_Gm20.SNPs.id.biallic_maf_0.01.vcf
+
+##heterozygotes to missing + imputation
+sed 's/0\/1/.\/./g' protein_Gm20.SNPs.id.biallic_maf_0.01_geno_0.1.vcf >> nohet_protein_Gm20.SNPs.id.biallic_maf_0.01_geno_0.1.vcf
+sed -i '/1\/0/.\/./g' nohet_protein_Gm20.SNPs.id.biallic_maf_0.01_geno_0.1.vcf
+java -jar /group/pawsey0149/jmarsh1/packages/beagle.18May20.d20.jar gt=/scratch/pawsey0149/jmarsh1/cqProt003/nohetvcf2hapmap/nohet_protein_Gm20.SNPs.id.biallic_maf_0.01_geno_0.1.vcf nthreads=22 out=nohet_prefin_b51_protein_Gm20.SNPs.id.biallic_maf_0.01.vcf
