@@ -12,3 +12,5 @@ sed -i "s/Gmrs/rs/" nohet_prefin_b51_protein_Gm20.SNPs.id.biallic_maf_0.01_geno_
 grep -v $'\tAC\t\|\tAG\t\|\tAT\t\|\tCA\t\|\tCG\t\|\tCT\t\|\tGA\t\|\tGC\t\|\tGT\t\|\tTA\t\|\tTC\t\|\tTG\t\|\tA\t20\|\tC\t20\|\tG\t20\|\tT\t20' nohet_prefin_b51_protein_Gm20.SNPs.id.biallic_maf_0.01_geno_0.1_hmp.txt >> nohet_fin_b51_protein_Gm20.SNPs.id.biallic_maf_0.01_geno_0.1_hmp.txt
 ##convert back
 #tassel-5-standalone/run_pipeline.pl -Xmx20G -h nohet_fin_b51_protein_Gm20.SNPs.id.biallic_maf_0.01_geno_0.1_hmp.txt -export -exportType VCF
+head -n 1 nohet_fin_b51_protein_Gm20.SNPs.id.biallic_maf_0.01_geno_0.1_hmp.txt > nohet_b51_173kb_only.hmp.txt
+awk '($4>31604127  && $4<31777346){print}' >> nohet_b51_173kb_only.hmp.txt
