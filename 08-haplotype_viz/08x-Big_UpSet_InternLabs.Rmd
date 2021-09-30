@@ -1,0 +1,322 @@
+##This was used for analysis but the image is too large for publication, so opted for split graphs
+
+---
+title: "cqUpSet3"
+author: "Jacob Marsh"
+date: "31/05/2021"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(root.dir = "C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs", 
+                      echo = TRUE)
+library(tidyverse)
+library(ComplexUpset)
+library(dplyr)
+library(splitstackshape)
+library(viridis)
+library(patchwork)
+library(ggplot2)
+library(vioplot)
+library(scales)
+```
+
+
+```{r Import}
+HapsFile <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/U_S_haps_fin.txt")
+AlleleFile <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/U_S_allele_fin.txt")
+PhenoSum <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/allpheno_resum.txt") 
+TagPhenos <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/pdifftags.csv") %>% 
+  subset(select = -X)
+AlleleCounts <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/ACAN_tagSNPs.txt") %>%
+  separate(COUNTINFO, c("AC", "AF"), sep = ";")
+TagPercDiffs <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/percdifftags.csv") %>%
+  subset(select = -X)
+mainpercdiffs <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/mainpercdiffs.csv") %>%
+  subset(select = -X) %>% 
+  mutate(percdiff = 100*percdiff)
+```
+
+```{r Reformat}
+grplongHap <- tidyr::gather(HapsFile, 
+                            "dom_status", 
+                            "n", 
+                            3:6)
+grplongHap_order <- print(grplongHap[, c(1, 2, 4, 5, 3)])
+longHap<- separate_rows(grplongHap_order, 
+                        altalleles, 
+                        sep = ';', 
+                        convert = TRUE)
+AlHap <- merge(x = longHap, 
+               y = AlleleFile, 
+               by.x = "altalleles", 
+               by.y = "allele")
+AlPhen <- merge(x = AlleleFile, 
+                y = PhenoSum, 
+                by.x = "allele", 
+                by.y = "Site")
+HapAlMatrix<- cSplit_e(HapsFile, 
+                       "altalleles", 
+                       sep = ";", 
+                       type = "character", 
+                       fill = 0, 
+                       drop = TRUE)
+happhen <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/happhenrdy.txt")
+hapnames <- c("A","B","C","D","E","F","G","H","I","J","K","L","M","N","O")
+longhapphen <- gather(data = happhen, 
+                      hapname, 
+                      protphen, 
+                      factor_key = T, 
+                      na.rm = T)
+allhappheno <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/allhappheno.txt")
+happhengrp <- transform(read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/happhengrp.txt"), 
+                        Prot = as.numeric(Prot))
+TagProp <- AlleleCounts %>% 
+  mutate(AltAF = as.numeric(AC) / as.numeric(AF)) %>% 
+  subset(select = -c(AC,AF))
+TagAlleles <- right_join(TagPhenos, 
+                         AlleleFile, 
+                         by =c("SNP" = "allele"))
+TagAlProp <- right_join(TagAlleles, 
+                        TagProp, 
+                        by = c("TAGGING" = "SITE"))
+TagProp2 <- AlleleCounts %>% 
+  mutate(AltAF = as.numeric(AC) / as.numeric(AF)) %>% 
+  subset(select = -c(AC,AF))
+TagAlleles2 <- right_join(TagPercDiffs, 
+                          AlleleFile, 
+                          by =c("SNP" = "allele"))
+TagAlProp2 <- right_join(TagAlleles2, 
+                         TagProp2, 
+                         by = c("TAGGING" = "SITE")) %>% 
+  mutate(percdiff = 100*percdiff)
+intersect <- HapAlMatrix %>% 
+  as_tibble() %>% 
+  gather(allele,
+         present,
+         7:ncol(.)) %>% 
+  mutate(present=as.factor(present)) %>%
+  mutate(allele = str_remove(allele, "altalleles_"))
+intersect_lines <- intersect %>% 
+  filter(present == 1) %>% 
+  group_by(hap) %>% 
+  mutate(allele = as.numeric(allele)) %>% 
+  summarise(max = max(allele), 
+            min = min(allele)) %>% 
+  mutate(min = as.character(min),
+         max = as.character(max))
+```
+
+```{r Middle plot}
+P1 <- ggplot() +
+  geom_segment(data = intersect_lines, 
+               aes(x = hap, 
+                   xend = hap,
+                   y = min, 
+                   yend = max)) +
+  geom_point(data = intersect,
+             aes(hap,
+                 allele,
+                 fill =present),
+             col ='black', 
+             pch = 21)+
+  scale_fill_manual(values = c('white','black'))+
+  theme_minimal()+
+  labs(x = '',
+       title = '',
+       y = '')+
+  theme(legend.position = 'none',
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        plot.margin = unit(c(0,0,0,0), 
+                           "cm"),
+        plot.title = element_blank())
+P1
+```
+
+```{r Top plot}
+P2 <- ggplot(data = grplongHap_order %>% 
+  mutate(dom_status=factor(dom_status,
+                           levels = c('wt','lr','oc','mc'))), 
+       aes(fill=dom_status, 
+           y=n, 
+           x=hap)) + 
+  geom_bar(position="stack", 
+           stat="identity") +
+  theme_minimal() +
+  ylab("nIndividuals by Haplotype") +
+  scale_fill_viridis(option = "C", 
+                     discrete = T, 
+                     direction = -1, 
+                     "Domestication Status", 
+                     labels = c("Wild-Type", "Landrace", "Old Cultivar", "Modern Cultivar")) +
+  theme(axis.title.x = element_blank(),
+        legend.title = element_text(size = 7),
+        legend.text = element_text(size = 5),
+        legend.key.size = unit(5, 
+                               "mm"),
+        axis.text.x = element_text(face = "bold", 
+                                   size = 10),
+        plot.margin = unit(c(0,0,0,0), 
+                           "cm")) +
+  scale_y_continuous(expand = c(0,0))
+  
+P2
+```
+
+```{r Right plot}
+P3<- ggplot() +
+  geom_jitter(data = TagAlProp2,
+              aes(x = abs(percdiff),
+                  y = as.character(SNP),
+                  fill = AltAF),
+              alpha = 0.2,
+              pch = 21) +
+  scale_fill_viridis(option = "D", direction = -1) +
+  geom_crossbar(data = mainpercdiffs,
+                aes(x =abs(percdiff),
+                    y = as.character(Site),
+                    xmin=-4,
+                    xmax=4,
+                    ymin=as.character(Site),
+                    ymax=as.character(Site),
+                    colour = percdiff),
+                    fatten = 20,
+                    width = diff(range(TagAlProp2$percdiff))/100,
+                stat = "identity") +
+  scale_colour_gradient2('Alt Rep Allele w/ Valence',
+                        low='red', 
+                        high='green',
+                        mid = "white",
+                        midpoint = 0,
+                        oob = squish) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_text(face = "bold",
+                                   size = 10),
+        plot.margin = unit(c(0,0.1,0,0), 
+                           "cm"),
+        legend.title = element_text(size = 7),
+        legend.text = element_text(size = 5),
+        legend.key.size = unit(5, 
+                               "mm"),
+        plot.title = element_blank()) +
+  xlab("% Seed protein effect")
+P3
+```
+
+```{r Left plot}
+P4 <- AlPhen %>% 
+  mutate(Type=factor(Type,levels = c("REF","MISS","HET","HETMISS","ALT"))) %>%
+  ggplot(aes(x = nInd, 
+             y = as.character(allele),
+             fill = Type,
+             color = Type),
+         ylim()) +
+  geom_bar(aes(), 
+           position = "stack", 
+           stat = "identity") +
+  scale_x_reverse(breaks = scales::pretty_breaks(n = 10), 
+                     expand = c(0,0)) +
+  geom_text(data = AlPhen %>%
+              filter(Type == "REF" | Type == "ALT") %>%
+              select(allele, 
+                     Type, 
+                     Alleles) %>%
+              reshape(idvar = "allele", 
+                      timevar = "Type", 
+                      direction = "wide") %>%
+              unite(x, 
+                    c(Alleles.REF, Alleles.ALT), 
+                    sep = "/", 
+                    remove = FALSE) %>%
+              merge(y = AlPhen, 
+                    by = 'allele'), 
+            aes(x=Inf,label = x), 
+            size = 2, hjust = -.5) +
+  theme_minimal() + 
+  theme(axis.text.y = element_text(face = "bold",
+                           size = 10), 
+        axis.title.y = element_blank(),
+        legend.title = element_text(size = 7),
+        legend.text = element_text(size = 5),
+        legend.key.size = unit(5, 
+                               "mm"),
+        axis.text.x = element_text(),
+        legend.position = "bottom",
+        plot.margin = unit(c(0,0,0,0.1), 
+                           "cm"),
+        plot.title = element_blank()) +
+ scale_color_manual(values = c('black', 'black', 'black', 'black', 'black'), 
+                    guide=F) +
+ scale_fill_manual(values = rev(c('#440154FF', "#238A8DFF", "#73D055FF", "#FDE725FF", "#FFFFFF"))) +
+  xlab("nIndividuals by Allele") +
+  scale_y_discrete(position = "right")
+  
+P4
+```
+
+```{r Bot plot}
+P5 <- ggplot() + 
+  geom_jitter(data=happhengrp, 
+              aes(x = Hap, 
+                  y = Prot,
+                  fill= Grp),
+              alpha=0.2, 
+              pch=21, 
+              width=0.2) + 
+  scale_fill_viridis(option = "C", 
+                     discrete = T, 
+                     direction = 1, 
+                     "Domestication Status", 
+                     labels = c("Modern Cultivar", "Old Cultivar","Landrace" , "Wild-Type")) +
+  geom_crossbar(data= aggregate(happhengrp[, 3], 
+                                list(happhengrp$Hap), 
+                                median),
+                aes(x= as.factor(Group.1),
+                    y=x,
+                    xmin= as.factor(Group.1) -1,
+                    xmax=as.factor(Group.1) +1,
+                    ymin=x,
+                    ymax=x,
+                    colour=x)) +
+  scale_colour_gradient('crossbar',
+                        low='red', 
+                        high='green',
+                        limits=c(max(top_frac(happhengrp,
+                                              -0.2,
+                                              Prot)$Prot),
+                                 min(top_frac(happhengrp,
+                                              0.2,
+                                              Prot)$Prot)), 
+                        oob = squish) +
+  theme_minimal() +
+  theme(legend.position = 'none',
+        axis.title.x = element_blank(),
+        axis.text.x = element_text(face = "bold",
+                           size = 10),
+        plot.margin = unit(c(0,0,0,0), 
+                           "cm")) +
+  ylab("% Seed Protein") +
+  scale_x_discrete(position = "top")
+P5 
+```
+
+```{r Stitch}
+all <- P1 + P2 + P3 + P4 + guide_area() + P5 + 
+          plot_layout(design = "EEBB##
+                                DDAACC
+                                ##FF##",
+                                guides='collect')
+all
+ggsave('temp_cqUpSet.pdf',
+       all, 
+       device = 'pdf', 
+       dpi = 300,
+       height = 9,
+       width = 16,
+       units = "in")
+getwd()
+```
