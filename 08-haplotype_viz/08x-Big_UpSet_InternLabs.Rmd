@@ -1,4 +1,5 @@
 ##This was used for analysis but the image is too large for publication, so opted for split graphs - it also includes pre-pruned haplotype groups
+##Much of this code was repurposed for scripts that made it into the manuscript
 
 ---
 title: "cqUpSet3"
