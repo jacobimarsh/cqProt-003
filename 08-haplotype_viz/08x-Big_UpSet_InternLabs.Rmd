@@ -10,7 +10,7 @@ output: html_document
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(root.dir = "C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs", 
+knitr::opts_chunk$set(root.dir = "Rinputs", 
                       echo = TRUE)
 library(tidyverse)
 library(ComplexUpset)
@@ -25,16 +25,16 @@ library(scales)
 
 
 ```{r Import}
-HapsFile <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/U_S_haps_fin.txt")
-AlleleFile <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/U_S_allele_fin.txt")
-PhenoSum <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/allpheno_resum.txt") 
-TagPhenos <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/pdifftags.csv") %>% 
+HapsFile <- read.csv("U_S_haps_fin.txt")
+AlleleFile <- read.csv("U_S_allele_fin.txt")
+PhenoSum <- read.csv("allpheno_resum.txt") 
+TagPhenos <- read.csv("pdifftags.csv") %>% 
   subset(select = -X)
-AlleleCounts <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/ACAN_tagSNPs.txt") %>%
+AlleleCounts <- read.csv("ACAN_tagSNPs.txt") %>%
   separate(COUNTINFO, c("AC", "AF"), sep = ";")
-TagPercDiffs <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/percdifftags.csv") %>%
+TagPercDiffs <- read.csv("percdifftags.csv") %>%
   subset(select = -X)
-mainpercdiffs <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/mainpercdiffs.csv") %>%
+mainpercdiffs <- read.csv("mainpercdiffs.csv") %>%
   subset(select = -X) %>% 
   mutate(percdiff = 100*percdiff)
 ```
@@ -63,15 +63,15 @@ HapAlMatrix<- cSplit_e(HapsFile,
                        type = "character", 
                        fill = 0, 
                        drop = TRUE)
-happhen <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/happhenrdy.txt")
+happhen <- read.csv("happhenrdy.txt")
 hapnames <- c("A","B","C","D","E","F","G","H","I","J","K","L","M","N","O")
 longhapphen <- gather(data = happhen, 
                       hapname, 
                       protphen, 
                       factor_key = T, 
                       na.rm = T)
-allhappheno <- read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/allhappheno.txt")
-happhengrp <- transform(read.csv("C:/Users/21485753/Desktop/cqProt003/UpSet_Plot/Rinputs/happhengrp.txt"), 
+allhappheno <- read.csv("allhappheno.txt")
+happhengrp <- transform(read.csv("happhengrp.txt"), 
                         Prot = as.numeric(Prot))
 TagProp <- AlleleCounts %>% 
   mutate(AltAF = as.numeric(AC) / as.numeric(AF)) %>% 
