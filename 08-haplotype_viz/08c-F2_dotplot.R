@@ -76,3 +76,11 @@ E <- ggplot() +
   scale_y_discrete(position = "left", labels = c(paste0("M0",as.character(6:1))))
 # filter(intersect_lines, !(hap %in% c('M01','M08')))
 E
+
+ggsave('E3.pdf',
+       E,
+       device = 'pdf',
+       dpi = 1800,
+       height = 120,
+       width = 120,
+       units = "mm")
