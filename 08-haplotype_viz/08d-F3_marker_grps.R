@@ -1,13 +1,13 @@
-PhenoSum <- read.csv("allpheno_resum3.txt") 
-AlleleFile <- read.csv("U_S_allele_fin3.txt") %>% filter(allele != 31628273 & allele != 31637882)
+PhenoSum <- read.csv("allpheno_resum3.txt") #Site,Type,Alleles,nInd,nIndPheno,AvPheno
+AlleleFile <- read.csv("U_S_allele_fin3.txt") %>% filter(allele != 31628273 & allele != 31637882) #from log2input.sh with pruned sites
 
 AlPhen <- merge(x = AlleleFile, 
                 y = PhenoSum, 
                 by.x = "allele", 
                 by.y = "Site")
 
-TagPercDiffs <- read.csv("percdifftags3.csv") %>% subset(select = -X) %>% filter(TAGGING >= 31604127 & TAGGING <= 31777346 & SNP != 31628273 & SNP != 31637882)
-AlleleCounts <- read.csv("ACAN_tagSNPs.txt") %>% separate(COUNTINFO, c("AC", "AF"), sep = ";" )%>% filter(SITE >= 31604127 & SITE <= 31777346)
+TagPercDiffs <- read.csv("percdifftags3.csv") %>% subset(select = -X) %>% filter(TAGGING >= 31604127 & TAGGING <= 31777346 & SNP != 31628273 & SNP != 31637882) #from tags_phenos.sh
+AlleleCounts <- read.csv("ACAN_tagSNPs.txt") %>% separate(COUNTINFO, c("AC", "AF"), sep = ";" )%>% filter(SITE >= 31604127 & SITE <= 31777346) #from tags_phenos.sh
 
 TagProp2 <- AlleleCounts %>% 
   mutate(AltAF = as.numeric(AC) / as.numeric(AF)) %>% 
