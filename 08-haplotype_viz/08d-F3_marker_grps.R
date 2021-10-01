@@ -1,3 +1,26 @@
+PhenoSum <- read.csv("allpheno_resum3.txt") 
+AlleleFile <- read.csv("U_S_allele_fin3.txt") %>% filter(allele != 31628273 & allele != 31637882)
+
+AlPhen <- merge(x = AlleleFile, 
+                y = PhenoSum, 
+                by.x = "allele", 
+                by.y = "Site")
+
+TagPercDiffs <- read.csv("percdifftags3.csv") %>% subset(select = -X) %>% filter(TAGGING >= 31604127 & TAGGING <= 31777346 & SNP != 31628273 & SNP != 31637882)
+AlleleCounts <- read.csv("ACAN_tagSNPs.txt") %>% separate(COUNTINFO, c("AC", "AF"), sep = ";" )%>% filter(SITE >= 31604127 & SITE <= 31777346)
+
+TagProp2 <- AlleleCounts %>% 
+  mutate(AltAF = as.numeric(AC) / as.numeric(AF)) %>% 
+  subset(select = -c(AC,AF))
+TagAlleles2 <- right_join(TagPercDiffs, 
+                          AlleleFile, 
+                          by =c("SNP" = "allele"))
+TagAlProp2 <- right_join(TagAlleles2, 
+                         TagProp2, 
+                         by = c("TAGGING" = "SITE")) %>% 
+  mutate(percdiff = 100*percdiff) %>% filter(!is.na(SNP))
+
+#Left plot (C)
 C <- AlPhen %>% 
   mutate(Type=factor(Type,levels = c("REF","MISS","HET","HETMISS","ALT"))) %>%
   ggplot(aes(x = nInd, 
@@ -12,22 +35,6 @@ C <- AlPhen %>%
            width = 0.8) +
   scale_x_reverse(breaks = scales::pretty_breaks(n = 5), 
                      expand = c(0,0)) +
-# geom_text(data = AlPhen %>%
-#             filter(Type == "REF" | Type == "ALT") %>%
-#             select(allele, 
-#                    Type, 
-#                    Alleles) %>%
-#             reshape(idvar = "allele", 
-#                     timevar = "Type", 
-#                     direction = "wide") %>%
-#             unite(x, 
-#                   c(Alleles.REF, Alleles.ALT), 
-#                   sep = "/", 
-#                   remove = FALSE) %>%
-#             merge(y = AlPhen, 
-#                   by = 'allele'), 
-#           aes(x=Inf,label = x), 
-#           size = 2, hjust = -.5) +
   theme_void() + 
   theme(axis.text.y = element_blank(), 
         axis.title.x = element_text(),
@@ -49,9 +56,9 @@ C <- AlPhen %>%
   scale_y_discrete(position = "right", labels = c(paste0("M",as.character(20:10)), paste0("M0",as.character(7:1))))
   
 C
-```
 
-```{r Right plot (D)}
+
+# Right plot (D)
 D <- ggplot() +
   geom_jitter(data = TagAlProp2,
               aes(x = abs(percdiff),
@@ -60,29 +67,9 @@ D <- ggplot() +
               alpha = 0.25,
               pch = 21,
               height = 0.25) +
-#  scale_fill_viridis(option = "D", direction = -1) +
   scale_fill_gradient('Minor allele frequency',
                       low = 'white',
                       high = '#440154FF') +
-#  geom_crossbar(data = mainpercdiffs,
-#                aes(x =abs(percdiff),
-#                    y = as.character(Site),
-#                    xmin=-4,
-#                    xmax=4,
-#                    ymin=as.character(Site),
-#                    ymax=as.character(Site),
-#                    colour = percdiff),
-#                    fatten = 100/nchar(mainpercdiffs$Site),
-#                    width = diff(range(TagAlProp2$percdiff))/100,
-#                stat = "identity") +
-#  scale_colour_gradient2('Representative marker',
-#                        low='red', 
-#                        high='green',
-#                        mid = "white",
-#                        midpoint = 3,
-#                        oob = squish,
-#                        labels = c(-3,4,6,8,10),
-#                        breaks = c(-3,4,6,8,10)) +
   scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
   theme_minimal() +
   theme(axis.title.y = element_blank(),
@@ -103,7 +90,7 @@ D <- ggplot() +
   scale_y_discrete(position = "left", labels = c(paste0(" M0",as.character(6:1))))
 
 D
-```
+
 
 CD <- C + D + plot_layout(design = "CD
                           CD")
