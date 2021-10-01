@@ -1,3 +1,5 @@
+#This aren't the exact files used for inputs, but the methodology was the same
+
 plink --vcf protein_INs.vcf --show-tags U_S_sites.txt --tag-r2 0.9 --list-all
 awk '{print $1,$NF}' plink.tags.list > tags.list
 sed 's/ /,/' tags.list | sed 's/|/;/g' >> semifile.txt
