@@ -4,7 +4,9 @@ library(forcats)
 library(patchwork)
 library(pals)
 
-alldat <- read.csv("C:/Users/21485753/Desktop/cqProt003/ins_demos/input4.txt", sep = "\t")
+#input4 from TableS6: Hap     ID      Prot    Grp     Origin_country  GWAS-SNP        31727019_Allele How (How is '31727019_CopyNum')
+
+alldat <- read.csv("input4.txt", sep = "\t")
 col_list <- c('wt'=npg_col[8],
               'lr' = npg_col[3],
               'ocult' =npg_col[2],
