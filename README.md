@@ -34,10 +34,16 @@ From raw vcf to filtered, imputed SNPs and filtered, recoded InDels
 
 **08-haplotype_viz**
 
-(Figures 2-5; Tables S5,S7) Custom visualization of results from haplotyping (05). Involves converting HaplotypeMiner output into inputs for visualization (05a), integrating supporting SNP info with phenotype data (05b); and the code to visualize marker/haplotype combinations (08c), summaries of marker groups in reference to protein (08d), summaries of haplotype groups in reference to oil and protein (08e), and to represent the demographic breakdowns for the different trinucleotide insertions at site 31727019 (08f). 08x was used for preliminary analysis to identify trends for haplotype and marker groups in parallel, it combines the key features of Figures 2-4 however is too large for publication, and still contains groups that were later pruned. 
+(Figures 2-5; Table S5) Custom visualization of results from haplotyping (05). Involves converting HaplotypeMiner output into inputs for visualization (05a), integrating supporting SNP info with phenotype data (05b); and the code to visualize marker/haplotype combinations (08c), summaries of marker groups in reference to protein (08d), summaries of haplotype groups in reference to oil and protein (08e), and to represent the demographic breakdowns for the different trinucleotide insertions at site 31727019 (08f). 08x was used for preliminary analysis to identify trends for haplotype and marker groups in parallel, it combines the key features of Figures 2-4 however is too large for publication, and still contains groups that were later pruned. 
 
 **09-pixy_ntdiv.sh**
 
+(Figures S13-14; Table S7) Variant calling from g.vcf to include invariant sites, allowing for pixy analysis, before visualizing dXY between haplotype groups as a heatmap
+
 **10-SV_mosdepth.sh**
 
+Mosdepth to identify the 304bp SV in 20G085100 using per base coverage information
+
 **0X-site_phenotests.sh**
+
+Miscelanous script used to test for allele frequencies and mean phenotype scores for populations possessing each allele at a given locus
