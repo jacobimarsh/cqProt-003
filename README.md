@@ -46,4 +46,4 @@ Mosdepth to identify the 304bp SV in 20G085100 using per base coverage informati
 
 **0X-site_phenotests.sh**
 
-Miscelanous script used to test for allele frequencies and mean phenotype scores for populations possessing each allele at a given locus
+Miscellaneous script used to test for allele frequencies and mean phenotype scores for populations possessing each allele at a given locus
