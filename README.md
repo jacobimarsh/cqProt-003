@@ -44,6 +44,10 @@ From raw vcf to filtered, imputed SNPs and filtered, recoded InDels
 
 Mosdepth to identify the 304bp SV in 20G085100 using per base coverage information
 
+**11-homologs.sh**
+
+BLAST the 20G085100 gene against the rest of the genome to identify paralogs, before extracting only hits for the ~300bp SV
+
 **0X-site_phenotests.sh**
 
 Miscellaneous script used to test for allele frequencies and mean phenotype scores for populations possessing each allele at a given locus
