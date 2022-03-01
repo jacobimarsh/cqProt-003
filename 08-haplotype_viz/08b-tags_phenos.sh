@@ -61,4 +61,4 @@ echo "SITE,COUNTINFO" >> ACAN_tagSNPs.txt
 awk 'FS = "," {print $4}' pdifftags.csv | tail -n +2 | grep -f - sort_protein_Gm20.SNPs.id.biallic_maf_0.01_geno_0.1.vcf | sed -e 's/^20\t//' |sed -e 's/\t20_.*AC/,AC/' | sed -e 's/\tGT.*//' | sed 's/..=//g' | sed 's/COUNTINFO/AC,AF/' | sed 's/;/,/' | awk 'FS="," {if ($1>=31604127 && $1<=31777346) print}' >> ACAN_tagSNPs.txt
 R
 library(tidyverse)
-AlleleCounts <- read.csv("ACAN_tagSNPs.txt") %>% separate(COUNTINFO, c("AC", "AF"), sep = ";")
+AlleleCounts <- read.csv("ACAN_tagSNPs.txt")
